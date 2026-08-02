@@ -1,1 +1,3 @@
 .omo/
+dist/
+node_modules/

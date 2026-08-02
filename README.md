@@ -254,6 +254,49 @@ A: `docker compose down -v && docker compose up -d`,会重新跑 migration + see
 
 ---
 
+## 九、模板展示页 (Showcase)
+
+`http://localhost:8081/showcase` 是个**公开访问、无需登录**的展示页 — 中间是 iPhone 风格的"手机框",里面跑的就是真实的 uni-app 小程序。右侧是特性卡片 + 关键 API 列表,适合直接发链接给 PM / 客户 / 投资人预览。
+
+**当前已实现**(`admin/frontend/src/views/showcase/index.vue`):
+- 🎨 渐变背景 + 手机框 mockup(375×760,带刘海)
+- 📱 iframe 嵌入 uni-app H5 build(若已构建)
+- 🔄 智能 fallback:H5 不存在时自动显示带 demo 账号 + 构建说明的占位页(`hasApp.value = false`)
+- 📋 右侧 4 张特性卡片(三端认证 / 状态机 / 管理端 / Docker)
+- 🔌 8 条关键 API 速查
+
+### 把真实 H5 build 放进去(可选,但推荐)
+
+展示页默认显示占位。要让 iframe 加载真实的小程序,需要先用 HBuilderX 出 H5:
+
+```bash
+# 在 HBuilderX 里:
+# 1. 打开 uniapp/ 目录
+# 2. 菜单 → 发行 → 网站-PC Web 或 手机H5
+# 3. 等待构建完成
+# 4. 找到输出目录(unpackage/dist/build/h5/ 或 build/h5/)
+# 5. 把里面所有文件复制到 admin/frontend/public/showcase-app/
+
+# 然后重建 admin frontend 容器:
+docker compose up -d --build frontend
+```
+
+完成后访问 `http://localhost:8081/showcase`,中间的手机框会自动变成真正的小程序 — 登录用 `demo_student` / `demo123` 就能看学生端,切到 `demo_employer` 看雇主端,`demo_agent` 看代理端。
+
+### 配置
+
+| 路径 | 作用 |
+|---|---|
+| `http://localhost:8081/showcase` | 公开访问的展示页(Vue SPA) |
+| `http://localhost:8081/showcase-app/` | uni-app H5 构建产物(via nginx alias) |
+| `http://localhost:8081/` | 默认重定向到 `/showcase`(未登录态) |
+
+nginx 配置在 `admin/frontend/nginx.conf` 的 `location /showcase-app/` 块,模板里已写好。docker build 时 `public/` 目录会被 vite 自动复制到 `dist/` 再拷进容器。
+
+**降级行为**:`public/showcase-app/index.html` 没替换时,Vue 页 `hasApp.value = false`,展示占位(含体验账号和构建步骤);有真实 H5 时自动切换到 iframe 加载。两种状态都有完整视觉,不会出 404。
+
+---
+
 ## License
 
 GNU GPLv3

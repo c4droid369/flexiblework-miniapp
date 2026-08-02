@@ -20,6 +20,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/login/index.vue'),
     meta: { public: true, title: 'Login' },
   },
+  // Public showcase page — phone-mockup + iframe of the uni-app H5 build.
+  // Lives outside the authenticated layout so anyone can hit the URL.
+  {
+    path: '/showcase',
+    name: 'showcase',
+    component: () => import('@/views/showcase/index.vue'),
+    meta: { public: true, title: '校园灵活用工 · 模板展示' },
+  },
   {
     path: '/',
     name: 'root',
@@ -40,7 +48,9 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
+  // Unauthenticated deep-links land on showcase instead of dashboard so
+  // visitors don't see a login wall on first visit.
+  { path: '/:pathMatch(.*)*', redirect: '/showcase' },
 ];
 
 const router = createRouter({
