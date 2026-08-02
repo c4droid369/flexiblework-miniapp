@@ -29,6 +29,7 @@ type Deps struct {
 	// Business services — campus gig work.
 	StudentProfileSvc  *service.StudentProfileService
 	EmployerProfileSvc *service.EmployerProfileService
+	AgentProfileSvc    *service.AgentProfileService
 	CategorySvc        *service.CategoryService
 	JobSvc             *service.JobService
 	AppSvc             *service.ApplicationService

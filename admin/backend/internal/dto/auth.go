@@ -84,7 +84,7 @@ type RegisterReq struct {
 	Nickname string `json:"nickname" binding:"max=64"`
 	Phone    string `json:"phone"    binding:"max=32"`
 	Email    string `json:"email"    binding:"omitempty,email,max=128"`
-	UserType string `json:"user_type" binding:"required,oneof=student employer"`
+	UserType string `json:"user_type" binding:"required,oneof=student employer agent"`
 }
 
 // CertAuditReq is shared by /admin/student-certifications/:id/audit and

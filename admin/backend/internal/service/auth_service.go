@@ -26,6 +26,7 @@ type AuthService struct {
 	menuRepo     repository.MenuRepository
 	studentRepo  repository.StudentProfileRepository
 	employerRepo repository.EmployerProfileRepository
+	agentRepo    repository.AgentProfileRepository
 	issuer       *auth.Issuer
 	accessTTL    time.Duration
 	logger       *slog.Logger
@@ -38,13 +39,14 @@ func NewAuthService(
 	menuRepo repository.MenuRepository,
 	studentRepo repository.StudentProfileRepository,
 	employerRepo repository.EmployerProfileRepository,
+	agentRepo repository.AgentProfileRepository,
 	issuer *auth.Issuer,
 	accessTTL time.Duration,
 	logger *slog.Logger,
 ) *AuthService {
 	return &AuthService{
 		users: users, refresh: refresh, roleRepo: roleRepo, menuRepo: menuRepo,
-		studentRepo: studentRepo, employerRepo: employerRepo,
+		studentRepo: studentRepo, employerRepo: employerRepo, agentRepo: agentRepo,
 		issuer: issuer, accessTTL: accessTTL, logger: logger,
 	}
 }
@@ -132,11 +134,15 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterReq, ip stri
 	}
 	// Create the empty profile row so the frontend's first GET returns an
 	// object instead of 404. Saves a round trip on the first profile load.
+	// Agent referral codes are minted on first GetMy (in profile_agent_service)
+	// so we don't need to duplicate the algorithm here.
 	switch req.UserType {
 	case "student":
 		_ = s.studentRepo.Upsert(ctx, &model.StudentProfile{UserID: u.ID})
 	case "employer":
 		_ = s.employerRepo.Upsert(ctx, &model.EmployerProfile{UserID: u.ID})
+	case "agent":
+		_ = s.agentRepo.Upsert(ctx, &model.AgentProfile{UserID: u.ID})
 	}
 	// Reload to pick up the freshly assigned role.
 	u, err = s.users.GetByID(ctx, u.ID)
@@ -300,8 +306,12 @@ func (s *AuthService) collectPermissions(ctx context.Context, u *model.User) ([]
 }
 
 // roleCodePermissions returns the business permission codes that map to a
-// role code, independent of the menu table. Used so student/employer roles
-// don't have to thread their permissions through a hidden menu tree.
+// role code, independent of the menu table. Used so student/employer/agent
+// roles don't have to thread their permissions through a hidden menu tree.
+//
+// agent is intentionally same-shape as employer — agents post jobs, audit
+// applications, settle orders through the same /employer/jobs endpoints.
+// JobService.Create checks both profile types when verifying the cert gate.
 func roleCodePermissions(roles []model.Role) []string {
 	student := []string{
 		"profile:view", "profile:update", "cert:submit",
@@ -311,7 +321,7 @@ func roleCodePermissions(roles []model.Role) []string {
 		"review:create", "review:view",
 		"message:view",
 	}
-	employer := []string{
+	business := []string{
 		"profile:view", "profile:update", "cert:submit",
 		"job:view", "category:view",
 		"job:create", "job:update", "job:delete", "job:offline",
@@ -325,8 +335,9 @@ func roleCodePermissions(roles []model.Role) []string {
 		switch r.Code {
 		case "student":
 			out = append(out, student...)
-		case "employer":
-			out = append(out, employer...)
+		case "employer", "agent":
+			// agent mirrors employer — they share the same business flow.
+			out = append(out, business...)
 		}
 	}
 	return out
@@ -342,22 +353,24 @@ func roleIDs(rs []model.Role) []uint64 {
 
 // deriveUserTypes maps the user's role codes to the user_type vocabulary
 // the mini-program consumes. The order is fixed: admin first, then
-// employer, then student — so a super-admin who is also a student gets
+// business roles, then student — so a super-admin who is also a student gets
 // UserType="admin" but UserTypes contains both.
 func deriveUserTypes(roles []model.Role) []string {
-	const admin, employer, student = "admin", "employer", "student"
-	var have [3]bool
+	const admin, employer, agent, student = "admin", "employer", "agent", "student"
+	var have [4]bool
 	for _, r := range roles {
 		switch r.Code {
 		case "super_admin", "admin":
 			have[0] = true
 		case "employer":
 			have[1] = true
-		case "student":
+		case "agent":
 			have[2] = true
+		case "student":
+			have[3] = true
 		}
 	}
-	out := make([]string, 0, 3)
+	out := make([]string, 0, 4)
 	if have[0] {
 		out = append(out, admin)
 	}
@@ -365,6 +378,9 @@ func deriveUserTypes(roles []model.Role) []string {
 		out = append(out, employer)
 	}
 	if have[2] {
+		out = append(out, agent)
+	}
+	if have[3] {
 		out = append(out, student)
 	}
 	return out

@@ -60,6 +60,7 @@ func Execute(ctx context.Context) error {
 	// Repositories — business (campus gig work).
 	studentProfileRepo := repository.NewStudentProfileRepository(db)
 	employerProfileRepo := repository.NewEmployerProfileRepository(db)
+	agentProfileRepo := repository.NewAgentProfileRepository(db)
 	categoryRepo := repository.NewCategoryRepository(db)
 	jobRepo := repository.NewJobRepository(db)
 	appRepo := repository.NewApplicationRepository(db)
@@ -77,7 +78,7 @@ func Execute(ctx context.Context) error {
 
 	// Services — system.
 	authSvc := service.NewAuthService(userRepo, refreshRepo, roleRepo, menuRepo,
-		studentProfileRepo, employerProfileRepo, issuer, cfg.JWTAccessTTL, logger)
+		studentProfileRepo, employerProfileRepo, agentProfileRepo, issuer, cfg.JWTAccessTTL, logger)
 	userSvc := service.NewUserService(userRepo, roleRepo)
 	roleSvc := service.NewRoleService(roleRepo)
 	menuSvc := service.NewMenuService(menuRepo)
@@ -87,8 +88,9 @@ func Execute(ctx context.Context) error {
 	// Services — business.
 	studentProfileSvc := service.NewStudentProfileService(studentProfileRepo, userRepo)
 	employerProfileSvc := service.NewEmployerProfileService(employerProfileRepo, userRepo)
+	agentProfileSvc := service.NewAgentProfileService(agentProfileRepo, userRepo)
 	categorySvc := service.NewCategoryService(categoryRepo)
-	jobSvc := service.NewJobService(jobRepo, categoryRepo, userRepo, employerProfileRepo)
+	jobSvc := service.NewJobService(jobRepo, categoryRepo, userRepo, employerProfileRepo, agentProfileRepo)
 	appSvc := service.NewApplicationService(appRepo, jobRepo, userRepo, studentProfileRepo, messageRepo)
 	orderSvc := service.NewOrderService(db, orderRepo, appRepo, appSvc, jobRepo, jobSvc, userRepo, employerProfileRepo, messageRepo)
 	reviewSvc := service.NewReviewService(reviewRepo, orderRepo, userRepo)
@@ -108,6 +110,7 @@ func Execute(ctx context.Context) error {
 		MenuSvc: menuSvc, OpSvc: opLogSvc, FileSvc: fileSvc,
 		StudentProfileSvc:  studentProfileSvc,
 		EmployerProfileSvc: employerProfileSvc,
+		AgentProfileSvc:    agentProfileSvc,
 		CategorySvc:        categorySvc,
 		JobSvc:             jobSvc,
 		AppSvc:             appSvc,

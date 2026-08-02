@@ -57,7 +57,7 @@
 			</view>
 		</view>
 
-		<view v-else-if="user.activeRole === 'employer'" class="emp-home">
+		<view v-else-if="user.activeRole === 'employer' || user.activeRole === 'agent'" class="emp-home">
 			<view class="header emp">
 				<view class="greet">
 					<text class="hi">{{ nickname }}, 下午好</text>
@@ -95,8 +95,8 @@
 				<view class="qi primary" @click="goPublish">
 					<text class="ico">➕</text>
 					<view>
-						<text class="t">发布新岗位</text>
-						<text class="d">几秒钟发布,招到合适的学生</text>
+						<text class="t">{{ user.activeRole === 'agent' ? '发布代理岗位' : '发布新岗位' }}</text>
+						<text class="d">{{ user.activeRole === 'agent' ? '面向校园用户招代理/学员' : '几秒钟发布,招到合适的学生' }}</text>
 					</view>
 				</view>
 				<view class="qi" @click="goMyJobs()">
@@ -163,13 +163,18 @@
 			const app = useAppStore()
 			app.loadCategories()
 			if (this.user.activeRole === 'student') this.refresh()
-			if (this.user.activeRole === 'employer') this.loadEmpStats()
+			// agent and employer share the same business endpoints — both
+			// surface the employer-side workbench on the home tab.
+			if (this.user.activeRole === 'employer' || this.user.activeRole === 'agent') {
+				this.loadEmpStats()
+			}
 		},
 		onPullDownRefresh() {
 			const done = () => uni.stopPullDownRefresh()
 			if (this.user.activeRole === 'student') this.refresh().finally(done)
-			else if (this.user.activeRole === 'employer') this.loadEmpStats().finally(done)
-			else done()
+			else if (this.user.activeRole === 'employer' || this.user.activeRole === 'agent') {
+				this.loadEmpStats().finally(done)
+			} else done()
 		},
 		methods: {
 			goLogin() { uni.navigateTo({ url: '/pages/auth/login' }) },

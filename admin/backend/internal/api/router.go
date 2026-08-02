@@ -95,6 +95,15 @@ func RegisterAPIRoutes(r *gin.RouterGroup, d Deps) {
 	biz.POST("/student/certification",
 		middleware.RequirePerm(d.Logger, "cert:submit"), studentProfileH.SubmitCertification)
 
+	// Agent side (campus agent — same /employer/* endpoints for jobs/applications/orders)
+	agentProfileH := handlers.NewAgentProfileHandler(d.AgentProfileSvc)
+	biz.GET("/agent/profile",
+		middleware.RequirePerm(d.Logger, "profile:view"), agentProfileH.GetMy)
+	biz.POST("/agent/profile",
+		middleware.RequirePerm(d.Logger, "profile:update"), agentProfileH.UpsertMy)
+	biz.POST("/agent/certification",
+		middleware.RequirePerm(d.Logger, "cert:submit"), agentProfileH.SubmitCertification)
+
 	// Apply (under /jobs/:id) + student applications
 	appH := handlers.NewApplicationHandler(d.AppSvc)
 	biz.POST("/jobs/:id/apply",
@@ -180,7 +189,7 @@ func RegisterAPIRoutes(r *gin.RouterGroup, d Deps) {
 		middleware.Auth(d.Issuer, d.Logger),
 		middleware.OperationLog(d.OpSvc, d.Logger),
 	)
-	adminH := handlers.NewAdminHandler(d.StudentProfileSvc, d.EmployerProfileSvc)
+	adminH := handlers.NewAdminHandler(d.StudentProfileSvc, d.EmployerProfileSvc, d.AgentProfileSvc)
 
 	adminBiz.GET("/admin/categories",
 		middleware.RequirePerm(d.Logger, "category:view"), categoryH.ListAdmin)
@@ -204,6 +213,10 @@ func RegisterAPIRoutes(r *gin.RouterGroup, d Deps) {
 		middleware.RequirePerm(d.Logger, "cert:audit"), adminH.ListPendingEmployerCerts)
 	adminBiz.POST("/admin/employer-certifications/:id/audit",
 		middleware.RequirePerm(d.Logger, "cert:audit"), adminH.AuditEmployerCert)
+	adminBiz.GET("/admin/agent-certifications",
+		middleware.RequirePerm(d.Logger, "cert:audit"), adminH.ListPendingAgentCerts)
+	adminBiz.POST("/admin/agent-certifications/:id/audit",
+		middleware.RequirePerm(d.Logger, "cert:audit"), adminH.AuditAgentCert)
 
 	adminBiz.GET("/admin/orders",
 		middleware.RequirePerm(d.Logger, "order:monitor"), orderH.ListAllAdmin)

@@ -44,4 +44,9 @@ export const certApi = {
   listPendingEmployer: () => get<EmployerCertItem[]>('/admin/employer-certifications'),
   auditEmployer: (userId: number, body: CertAuditReq) =>
     post<null>(`/admin/employer-certifications/${userId}/audit`, body),
+  // Campus agent — reuses EmployerCertListItem shape (admin UI doesn't
+  // distinguish employer vs agent at a glance).
+  listPendingAgent: () => get<EmployerCertItem[]>('/admin/agent-certifications'),
+  auditAgent: (userId: number, body: CertAuditReq) =>
+    post<null>(`/admin/agent-certifications/${userId}/audit`, body),
 };

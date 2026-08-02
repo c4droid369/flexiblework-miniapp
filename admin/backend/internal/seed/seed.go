@@ -61,6 +61,7 @@ func seedRoles(ctx context.Context, db *gorm.DB) error {
 		// code, so the menu binding is not used for these.
 		{Code: "student", Name: "学生", Description: "学生端(报名兼职、查看订单、评价)", Sort: 10, Status: model.RoleStatusActive},
 		{Code: "employer", Name: "雇主", Description: "雇主端(发布岗位、审核报名、结算订单)", Sort: 11, Status: model.RoleStatusActive},
+		{Code: "agent", Name: "校园代理", Description: "校园代理(发代理岗、推广追踪、佣金结算预留)", Sort: 12, Status: model.RoleStatusActive},
 	}
 	for i := range roles {
 		r := roles[i]

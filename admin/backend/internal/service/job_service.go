@@ -12,14 +12,19 @@ import (
 	"github.com/admin-template/backend/internal/repository"
 )
 
-// JobService is the public + employer + admin view of the gig catalogue.
+// JobService is the public + employer/agent + admin view of the gig catalogue.
 // Cross-entity lookups (employer, category) are denormalized into the DTO
 // here so the mini-program gets a single round-trip per page.
+//
+// employer_id on a job is the *user_id* of whoever posted it — either an
+// employer OR a campus agent. Both share this service; the cert gate at
+// Create time checks whichever profile is present.
 type JobService struct {
 	jobRepo      repository.JobRepository
 	categoryRepo repository.CategoryRepository
 	userRepo     repository.UserRepository
 	employerRepo repository.EmployerProfileRepository
+	agentRepo    repository.AgentProfileRepository
 }
 
 func NewJobService(
@@ -27,23 +32,25 @@ func NewJobService(
 	categoryRepo repository.CategoryRepository,
 	userRepo repository.UserRepository,
 	employerRepo repository.EmployerProfileRepository,
+	agentRepo repository.AgentProfileRepository,
 ) *JobService {
-	return &JobService{jobRepo: jobRepo, categoryRepo: categoryRepo, userRepo: userRepo, employerRepo: employerRepo}
+	return &JobService{
+		jobRepo: jobRepo, categoryRepo: categoryRepo, userRepo: userRepo,
+		employerRepo: employerRepo, agentRepo: agentRepo,
+	}
 }
 
-// Create persists a new job in status 1 (待审核) and bumps the employer's
-// total_jobs counter. It refuses the request if the employer is not
-// certified — the admin spec is "未认证不能发岗".
+// Create persists a new job in status 1 (待审核) and bumps the poster's
+// total_jobs counter (employer OR agent). It refuses the request if the
+// caller has no certified business profile — admins decide which role to
+// approve via the cert audit flow.
 func (s *JobService) Create(ctx context.Context, employerUserID uint64, req dto.CreateJobReq) (*dto.JobResp, error) {
-	ep, err := s.employerRepo.GetByUserID(ctx, employerUserID)
-	if errors.Is(err, repository.ErrNotFound) {
-		return nil, httperr.Forbidden("请先完成雇主认证")
-	}
+	posterKind, err := s.resolvePoster(ctx, employerUserID)
 	if err != nil {
-		return nil, httperr.Internal(err)
+		return nil, err
 	}
-	if ep.CertStatus != 2 {
-		return nil, httperr.Forbidden("雇主资质未通过认证,无法发布岗位")
+	if posterKind == "" {
+		return nil, httperr.Forbidden("请先完成资质认证(雇主或校园代理)")
 	}
 	j := &model.Job{
 		EmployerID:        employerUserID,
@@ -79,8 +86,37 @@ func (s *JobService) Create(ctx context.Context, employerUserID uint64, req dto.
 	if err := s.jobRepo.Create(ctx, j); err != nil {
 		return nil, httperr.Internal(err)
 	}
-	_ = s.employerRepo.IncTotalJobs(ctx, employerUserID, 1)
+	if posterKind == "agent" {
+		_ = s.agentRepo.IncTotalJobs(ctx, employerUserID, 1)
+	} else {
+		_ = s.employerRepo.IncTotalJobs(ctx, employerUserID, 1)
+	}
 	return s.Get(ctx, j.ID, false)
+}
+
+// resolvePoster returns "employer" / "agent" / "" (no business profile)
+// and enforces the cert gate. Caller-side check is centralized here so
+// every job-mutating verb (Create, Offline, …) can share the same logic.
+func (s *JobService) resolvePoster(ctx context.Context, userID uint64) (string, error) {
+	if ep, err := s.employerRepo.GetByUserID(ctx, userID); err == nil {
+		if ep.CertStatus != 2 {
+			return "", httperr.Forbidden("资质未通过认证,无法发布岗位")
+		}
+		return "employer", nil
+	} else if !errors.Is(err, repository.ErrNotFound) {
+		return "", httperr.Internal(err)
+	}
+	ap, err := s.agentRepo.GetByUserID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return "", nil // no business profile — caller will return Forbidden
+		}
+		return "", httperr.Internal(err)
+	}
+	if ap.CertStatus != 2 {
+		return "", httperr.Forbidden("资质未通过认证,无法发布岗位")
+	}
+	return "agent", nil
 }
 
 // Update mutates an existing job. Only the owning employer may call this,

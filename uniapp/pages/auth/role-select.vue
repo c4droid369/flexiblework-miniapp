@@ -17,6 +17,11 @@
 				<view class="t">我是雇主</view>
 				<view class="d">招靠谱学生 · 发布岗位</view>
 			</view>
+			<view class="role-card agent" @click="pick('agent')">
+				<view class="emoji">🤝</view>
+				<view class="t">我是校园代理</view>
+				<view class="d">校园推广 · 招学员/客户</view>
+			</view>
 		</view>
 
 		<view class="bottom">
@@ -57,6 +62,7 @@
 			background: linear-gradient(90deg, $brand-primary 0%, $brand-accent 100%);
 		}
 		&.emp::before { background: linear-gradient(90deg, $brand-secondary 0%, $brand-accent 100%); }
+		&.agent::before { background: linear-gradient(90deg, $brand-accent 0%, $brand-primary 100%); }
 		.emoji { font-size: 100rpx; line-height: 1; }
 		.t { font-size: $font-xl; font-weight: 600; color: $text-primary; margin-top: $spacing-sm; }
 		.d { font-size: $font-sm; color: $text-secondary; margin-top: $spacing-xs; }

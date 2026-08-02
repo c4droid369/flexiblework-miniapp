@@ -11,14 +11,19 @@ import (
 )
 
 // AdminHandler aggregates the admin-only endpoints that don't fit elsewhere:
-// the cert-review queues (student + employer) and the audit calls.
+// the cert-review queues (student + employer + agent) and the audit calls.
 type AdminHandler struct {
 	studentProfileSvc  *service.StudentProfileService
 	employerProfileSvc *service.EmployerProfileService
+	agentProfileSvc    *service.AgentProfileService
 }
 
-func NewAdminHandler(s *service.StudentProfileService, e *service.EmployerProfileService) *AdminHandler {
-	return &AdminHandler{studentProfileSvc: s, employerProfileSvc: e}
+func NewAdminHandler(
+	s *service.StudentProfileService,
+	e *service.EmployerProfileService,
+	a *service.AgentProfileService,
+) *AdminHandler {
+	return &AdminHandler{studentProfileSvc: s, employerProfileSvc: e, agentProfileSvc: a}
 }
 
 // ListPendingStudentCerts godoc
@@ -101,6 +106,49 @@ func (h *AdminHandler) AuditEmployerCert(c *gin.Context) {
 		return
 	}
 	if err := h.employerProfileSvc.AuditCert(c.Request.Context(), uid, req.Action, req.Remark); err != nil {
+		httperr.Write(c, nil, err)
+		return
+	}
+	response.OK(c, nil)
+}
+
+// ListPendingAgentCerts godoc
+// @Summary      待审核校园代理资质
+// @Tags         Admin/Cert
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Envelope{data=[]dto.EmployerCertListItem}
+// @Router       /admin/agent-certifications [get]
+func (h *AdminHandler) ListPendingAgentCerts(c *gin.Context) {
+	rows, err := h.agentProfileSvc.ListPendingCerts(c.Request.Context())
+	if err != nil {
+		httperr.Write(c, nil, err)
+		return
+	}
+	response.OK(c, rows)
+}
+
+// AuditAgentCert godoc
+// @Summary      审核校园代理资质
+// @Tags         Admin/Cert
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path      int  true  "代理 user_id"
+// @Param        body  body      dto.CertAuditReq  true  "action: 2=通过 3=拒绝"
+// @Success      200   {object}  response.Envelope
+// @Router       /admin/agent-certifications/{id}/audit [post]
+func (h *AdminHandler) AuditAgentCert(c *gin.Context) {
+	uid, ok := parseID(c)
+	if !ok {
+		return
+	}
+	var req dto.CertAuditReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httperr.Write(c, nil, httperr.BadRequest("invalid request body"))
+		return
+	}
+	if err := h.agentProfileSvc.AuditCert(c.Request.Context(), uid, req.Action, req.Remark); err != nil {
 		httperr.Write(c, nil, err)
 		return
 	}

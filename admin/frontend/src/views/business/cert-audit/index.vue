@@ -3,6 +3,7 @@
     <div class="search-form">
       <el-tabs v-model="tab" @tab-change="reload">
         <el-tab-pane label="雇主资质" name="employer" />
+        <el-tab-pane label="校园代理资质" name="agent" />
         <el-tab-pane label="学生认证" name="student" />
       </el-tabs>
     </div>
@@ -35,6 +36,36 @@
         <template #default="{ row }">
           <el-button v-permission="'cert:audit'" link type="success" @click="auditEmployer(row as EmployerCertItem, 2)">通过</el-button>
           <el-button v-permission="'cert:audit'" link type="danger" @click="auditEmployer(row as EmployerCertItem, 3)">拒绝</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 校园代理资质 (复用 employer list shape,字段语义对齐校园卡/实名/推荐码) -->
+    <el-table v-else-if="tab==='agent'" v-loading="loading" :data="agentList" border>
+      <el-table-column prop="user_id" label="用户ID" width="100" />
+      <el-table-column prop="username" label="账号" width="140" />
+      <el-table-column prop="real_name" label="姓名" width="120" />
+      <el-table-column prop="contact_phone" label="电话" width="140" />
+      <el-table-column label="身份证/校园卡" width="120">
+        <template #default="{ row }">
+          <el-image
+            v-if="row.business_license_img"
+            :src="row.business_license_img"
+            :preview-src-list="[row.business_license_img]"
+            fit="cover"
+            style="width: 60px; height: 60px; border-radius: 4px"
+            preview-teleported
+          />
+          <span v-else class="muted">—</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="created_at" label="提交时间" width="180">
+        <template #default="{ row }">{{ formatTs(row.created_at) }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="200" fixed="right">
+        <template #default="{ row }">
+          <el-button v-permission="'cert:audit'" link type="success" @click="auditAgent(row as EmployerCertItem, 2)">通过</el-button>
+          <el-button v-permission="'cert:audit'" link type="danger" @click="auditAgent(row as EmployerCertItem, 3)">拒绝</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -104,11 +135,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { certApi, type EmployerCertItem, type StudentCertItem } from '@/api/cert';
 
-const tab = ref<'employer' | 'student'>('employer');
+const tab = ref<'employer' | 'agent' | 'student'>('employer');
 const empList = ref<EmployerCertItem[]>([]);
+const agentList = ref<EmployerCertItem[]>([]);
 const stuList = ref<StudentCertItem[]>([]);
 const loading = ref(false);
 
@@ -116,12 +148,13 @@ const dialogVisible = ref(false);
 const saving = ref(false);
 const auditRemark = ref('');
 const pendingAction = ref<2 | 3>(2);
-const pendingKind = ref<'employer' | 'student'>('employer');
+const pendingKind = ref<'employer' | 'agent' | 'student'>('employer');
 const pendingUserId = ref<number>(0);
 
 const actionTitle = computed(() => {
   const pass = pendingAction.value === 2;
-  return (pass ? '通过' : '拒绝') + (pendingKind.value === 'employer' ? '雇主资质' : '学生认证');
+  const kindLabel = pendingKind.value === 'employer' ? '雇主资质' : pendingKind.value === 'agent' ? '校园代理资质' : '学生认证';
+  return (pass ? '通过' : '拒绝') + kindLabel;
 });
 const actionType = computed(() => (pendingAction.value === 2 ? 'primary' : 'danger'));
 
@@ -138,6 +171,8 @@ async function reload() {
   try {
     if (tab.value === 'employer') {
       empList.value = await certApi.listPendingEmployer();
+    } else if (tab.value === 'agent') {
+      agentList.value = await certApi.listPendingAgent();
     } else {
       stuList.value = await certApi.listPendingStudent();
     }
@@ -148,6 +183,14 @@ async function reload() {
 
 function auditEmployer(row: EmployerCertItem, action: 2 | 3) {
   pendingKind.value = 'employer';
+  pendingUserId.value = row.user_id;
+  pendingAction.value = action;
+  auditRemark.value = '';
+  dialogVisible.value = true;
+}
+
+function auditAgent(row: EmployerCertItem, action: 2 | 3) {
+  pendingKind.value = 'agent';
   pendingUserId.value = row.user_id;
   pendingAction.value = action;
   auditRemark.value = '';
@@ -167,6 +210,8 @@ async function confirmAudit() {
   try {
     if (pendingKind.value === 'employer') {
       await certApi.auditEmployer(pendingUserId.value, { action: pendingAction.value, remark: auditRemark.value });
+    } else if (pendingKind.value === 'agent') {
+      await certApi.auditAgent(pendingUserId.value, { action: pendingAction.value, remark: auditRemark.value });
     } else {
       await certApi.auditStudent(pendingUserId.value, { action: pendingAction.value, remark: auditRemark.value });
     }

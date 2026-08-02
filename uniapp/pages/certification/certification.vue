@@ -22,6 +22,13 @@
 				<view class="field"><text class="label">学号</text><input class="input" v-model="form.student_no" maxlength="64" /></view>
 				<view class="field"><text class="label">个人简介</text><textarea class="textarea" v-model="form.bio" maxlength="500" placeholder="一句话介绍自己"></textarea></view>
 			</template>
+			<template v-else-if="role==='agent'">
+				<view class="field"><text class="label">真实姓名</text><input class="input" v-model="form.real_name" maxlength="64" /></view>
+				<view class="field"><text class="label">手机号</text><input class="input" v-model="form.phone" maxlength="32" /></view>
+				<view class="field"><text class="label">微信号(可选)</text><input class="input" v-model="form.wechat" maxlength="64" placeholder="方便客户/学员联系" /></view>
+				<view class="field"><text class="label">身份证号(可选,认证时必填)</text><input class="input" v-model="form.id_card_no" maxlength="32" /></view>
+				<view class="field"><text class="label">个人简介</text><textarea class="textarea" v-model="form.bio" maxlength="500" placeholder="介绍一下你的校园资源和推广能力"></textarea></view>
+			</template>
 			<template v-else>
 				<view class="field"><text class="label">公司/店铺名称</text><input class="input" v-model="form.company_name" maxlength="128" /></view>
 				<view class="field"><text class="label">联系人</text><input class="input" v-model="form.contact_name" maxlength="64" /></view>
@@ -35,12 +42,12 @@
 			<button class="btn-primary save" :disabled="saving" @click="onSave">{{ saving ? '保存中...' : '保存资料' }}</button>
 		</view>
 
-		<!-- Cert form (both roles) -->
+		<!-- Cert form (all three roles) -->
 		<view v-else class="form card">
 			<view v-if="certStatus===2" class="state-card approved">
 				<text class="big">✅</text>
 				<text class="t">已通过认证</text>
-				<text class="muted">你已具备完整的{{ role==='student' ? '学生' : '雇主' }}权限</text>
+				<text class="muted">你已具备完整的{{ roleLabel }}权限</text>
 			</view>
 			<view v-else-if="certStatus===1" class="state-card pending">
 				<text class="big">⏳</text>
@@ -48,11 +55,18 @@
 				<text class="muted">管理端会在 1-2 个工作日内审核,请耐心等待</text>
 			</view>
 			<view v-else>
-				<text class="muted intro">请{{ role==='student' ? '上传身份证正反面 + 学生证' : '填写以下信息并上传营业执照' }},提交后进入审核。</text>
+				<text class="muted intro">{{ certIntro }}</text>
 				<view v-if="role==='student'">
 					<image-uploader v-model="form.id_card_front" label="身份证正面" />
 					<image-uploader v-model="form.id_card_back" label="身份证反面" />
 					<image-uploader v-model="form.student_card" label="学生证" />
+				</view>
+				<view v-else-if="role==='agent'">
+					<view class="field"><text class="label">真实姓名</text><input class="input" v-model="certForm.real_name" maxlength="64" /></view>
+					<view class="field"><text class="label">手机号</text><input class="input" v-model="certForm.phone" maxlength="32" /></view>
+					<image-uploader v-model="form.id_card_front" label="身份证正面" />
+					<image-uploader v-model="form.id_card_back" label="身份证反面" />
+					<image-uploader v-model="form.campus_card" label="校园卡 / 学生证" />
 				</view>
 				<view v-else>
 					<view class="field"><text class="label">公司名称</text><input class="input" v-model="certForm.company_name" maxlength="128" /></view>
@@ -108,6 +122,7 @@
 				tab: 'profile',
 				form: {},
 				certForm: { business_license_no: '', company_name: '', contact_name: '', contact_phone: '' },
+				agentCertForm: { real_name: '', phone: '' },
 				certStatus: 0,
 				saving: false,
 			}
@@ -115,6 +130,14 @@
 		computed: {
 			user() { return useUserStore() },
 			role() { return this.user.activeRole },
+			roleLabel() {
+				return { student: '学生', employer: '雇主', agent: '校园代理' }[this.role] || '用户'
+			},
+			certIntro() {
+				if (this.role === 'student') return '上传身份证正反面 + 学生证,提交后进入审核。'
+				if (this.role === 'agent') return '填写实名信息并上传身份证 + 校园卡,提交后进入审核。'
+				return '填写以下信息并上传营业执照,提交后进入审核。'
+			},
 		},
 		onLoad(q) {
 			if (q && q.tab) this.tab = q.tab
@@ -127,6 +150,14 @@
 						const p = await profileApi.getStudent()
 						this.form = { gender: 0, ...(p || {}) }
 						this.certStatus = (p && p.cert_status) || 0
+					} else if (this.role === 'agent') {
+						const p = await profileApi.getAgent()
+						this.form = { ...(p || {}) }
+						this.certStatus = (p && p.cert_status) || 0
+						if (p) {
+							this.agentCertForm.real_name = p.real_name || ''
+							this.agentCertForm.phone = p.phone || ''
+						}
 					} else {
 						const p = await profileApi.getEmployer()
 						this.form = { ...(p || {}) }
@@ -137,7 +168,10 @@
 			async onSave() {
 				this.saving = true
 				try {
-					const fn = this.role === 'student' ? profileApi.updateStudent : profileApi.updateEmployer
+					let fn
+					if (this.role === 'student') fn = profileApi.updateStudent
+					else if (this.role === 'agent') fn = profileApi.updateAgent
+					else fn = profileApi.updateEmployer
 					const cleaned = this.clean(this.form)
 					await fn(cleaned)
 					toastSuccess('保存成功')
@@ -155,6 +189,18 @@
 							id_card_front: this.form.id_card_front,
 							id_card_back: this.form.id_card_back,
 							student_card: this.form.student_card,
+						})
+					} else if (this.role === 'agent') {
+						if (!this.form.id_card_front || !this.form.id_card_back || !this.form.campus_card ||
+							!this.agentCertForm.real_name || !this.agentCertForm.phone) {
+							return toastError('请上传所有图片并填写真实信息')
+						}
+						await profileApi.submitAgentCert({
+							real_name: this.agentCertForm.real_name,
+							phone: this.agentCertForm.phone,
+							id_card_front: this.form.id_card_front,
+							id_card_back: this.form.id_card_back,
+							campus_card: this.form.campus_card,
 						})
 					} else {
 						if (!this.certForm.company_name || !this.certForm.business_license_no ||

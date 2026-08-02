@@ -110,11 +110,12 @@ docker compose up -d
 - 管理端: `http://localhost:8081` (沿用原 admin 模板)
 
 首次启动会自动跑 migration + seed,创建:
-- 4 个角色: `super_admin`, `common`, `student`, `employer`
-- 3 个体验账号:
+- 5 个角色: `super_admin`, `common`, `student`, `employer`, `agent`
+- 3 个预置体验账号:
   - 管理员: `admin` / `admin123`
   - 学生: `demo_student` / `demo123` (已通过认证)
   - 雇主: `demo_employer` / `demo123` (已通过资质认证)
+- 校园代理 `demo_agent` / `demo123` 是首次注册后由 E2E 测试创建(已通过资质,可以测发岗)
 - 7 个分类 + 4 个示例岗位(全部已审核过,status=招聘中)
 
 ### 2. 启动小程序
@@ -126,7 +127,7 @@ docker compose up -d
    - 真机/小程序开发工具: `http://<你的电脑局域网IP>:8080`
 3. 在 `manifest.json` 填入你的微信小程序 appid(`mp-weixin.appid`)
 4. 运行 → 运行到小程序模拟器(或真机/微信开发者工具)
-5. 用 `demo_student` 或 `demo_employer` 登录体验
+5. 用 `demo_student` / `demo_employer` / `demo_agent` 登录体验
 
 ---
 
@@ -171,6 +172,13 @@ docker compose up -d
 - `GET  /api/v1/applications` / `:id` / `:id/cancel`
 - `GET  /api/v1/orders` / `:id` / `:id/pay` / `:id/checkin` / `:id/complete` / `:id/cancel` / `:id/review`
 
+### 校园代理 (需要 `agent` 角色 + 对应权限码)
+- `GET  /api/v1/agent/profile`
+- `POST /api/v1/agent/profile`
+- `POST /api/v1/agent/certification`
+
+> 校园代理与雇主共享业务权限与端点。发岗、报名审核、下单、订单等都走 `/api/v1/employer/*`(JobService.Create 通过 `resolvePoster()` 同时支持两者),前端根据 `user_type` 自动切换文案。
+
 ### 雇主 (需要 `employer` 角色 + 对应权限码)
 - `GET  /api/v1/employer/profile` / `POST /employer/profile` / `POST /employer/certification`
 - `GET  /api/v1/employer/jobs` / `POST` / `PUT /:id` / `DELETE /:id` / `POST /:id/offline`
@@ -185,6 +193,7 @@ docker compose up -d
 - `POST /api/v1/admin/jobs/:id/audit` (action: 2=通过 4=拒绝)
 - `GET/POST /api/v1/admin/student-certifications`
 - `GET/POST /api/v1/admin/employer-certifications`
+- `GET/POST /api/v1/admin/agent-certifications` (校园代理资质审核)
 - `GET /api/v1/admin/orders`
 - `GET/DELETE /api/v1/admin/reviews/:id`
 - `POST /api/v1/admin/messages/broadcast`
@@ -200,8 +209,16 @@ docker compose up -d
 | `super_admin` | 全部(通过 menu→role 联动 + 全部业务权限) |
 | `student` | profile:*, cert:submit, job:apply, application:*, order:*, review:create, message:view |
 | `employer` | profile:*, cert:submit, job:create/update/delete/offline, application:*, order:*, review:create, message:view |
+| `agent`   | 同 employer(共享业务权限;JobService 通过 `resolvePoster()` 同时支持) |
 
-学生/雇主角色的权限码在 `service/auth_service.go::roleCodePermissions` 里硬编码(为简化模板,不走 menu 系统)。
+学生/雇主/代理角色的权限码在 `service/auth_service.go::roleCodePermissions` 里硬编码(为简化模板,不走 menu 系统)。
+
+**校园代理 vs 雇主**:两者都"发岗招人",业务权限完全相同。区别在:
+- profile 表不同(`agent_profiles` 多了 `referral_code` 推荐码、`bank_account` 银行预留、`total_referrals/total_earnings` 佣金预留)
+- 注册时前端选的角色不同,后端会创建对应的 profile 行
+- admin 后台的"资质审核"页有第三个 tab "校园代理资质"
+- 小程序首页/我的页:agent 用黄色主题(`$brand-accent`),雇主用绿色主题(`$brand-secondary`),学生用橙色主题(`$brand-primary`)
+- "我的"页 agent 多显示一个"我的推荐码"卡片(可一键复制)
 
 ---
 

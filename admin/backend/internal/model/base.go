@@ -29,6 +29,7 @@ func All() []any {
 		// users), then taxonomy, then transactional tables.
 		new(StudentProfile),
 		new(EmployerProfile),
+		new(AgentProfile),
 		new(Category),
 		new(Job),
 		new(Application),
