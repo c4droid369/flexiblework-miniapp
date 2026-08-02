@@ -31,10 +31,22 @@ cd AdminTemplate
 docker compose up -d
 ```
 
-- Frontend: http://localhost:8080
-- Backend API: http://localhost:8080/api/v1
+- Frontend: http://localhost:8081 (default, set `FRONTEND_PORT` to change)
+- Backend API: http://localhost:8080/api/v1 (default, set `BACKEND_PORT` to change)
 - Swagger: http://localhost:8080/swagger/index.html
 - Login: `admin` / `admin123` (change immediately in production)
+
+#### Changing the port
+
+The backend port is fully driven by the `BACKEND_PORT` env var. To move the backend off 8080:
+
+```bash
+BACKEND_PORT=9000 FRONTEND_PORT=9081 docker compose up -d
+```
+
+Both the host port mapping, container-side `SERVER_PORT`, `STORAGE_BASE_URL`, AND the admin frontend's nginx `proxy_pass` URLs follow it — no file edits needed. The admin frontend's `nginx.conf` is a template; `envsubst` renders `${BACKEND_PORT}` at container start.
+
+The uni-app mini-program reads the API URL from local storage (configurable in "我的 → 服务器设置"), so it also adapts without a rebuild.
 
 ## Layout
 

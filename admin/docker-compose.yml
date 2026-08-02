@@ -39,7 +39,9 @@ services:
         condition: service_healthy
     environment:
       SERVER_HOST: 0.0.0.0
-      SERVER_PORT: "8080"
+      # Backend listening port — mirrors BACKEND_PORT (the host-mapped port).
+      # Change either to change both, e.g. `BACKEND_PORT=8081 docker compose up -d`.
+      SERVER_PORT: ${BACKEND_PORT:-8080}
       SERVER_ENV: ${SERVER_ENV:-development}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       LOG_FORMAT: ${LOG_FORMAT:-text}
@@ -53,11 +55,15 @@ services:
       JWT_REFRESH_TTL: 168h
       STORAGE_TYPE: local
       STORAGE_LOCAL_PATH: /app/storage/uploads
-      STORAGE_BASE_URL: http://localhost:8080/files
+      # File URLs are reconstructed by the backend with this base, so it must
+      # track BACKEND_PORT too (browser hits <BACKEND_PORT>/files/... directly).
+      STORAGE_BASE_URL: http://localhost:${BACKEND_PORT:-8080}/files
       CORS_ORIGINS: ${CORS_ORIGINS:-*}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+    # Host port : container port. Both come from BACKEND_PORT so changing one
+    # keeps them in sync — admin frontend's nginx proxies to backend:<BACKEND_PORT>.
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
     volumes:
       - backend_storage:/app/storage
     networks:
@@ -71,6 +77,11 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    # Mirror BACKEND_PORT so the nginx template can proxy_pass to the
+    # matching container-side port. The default here MUST match the
+    # backend's default (see above) so a no-env launch stays self-consistent.
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-8080}
     ports:
       - "${FRONTEND_PORT:-8081}:80"
     networks:

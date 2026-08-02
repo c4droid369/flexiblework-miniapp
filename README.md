@@ -104,13 +104,29 @@ cd admin
 docker compose up -d
 ```
 
-- MySQL: `localhost:3306` (root/rootpass)
-- 后端 API: `http://localhost:8080/api/v1`
+- MySQL: `localhost:3306` (root/rootpass,默认)
+- 后端 API: `http://localhost:8080/api/v1` (默认端口,见下方"端口配置")
 - 后端 Swagger: `http://localhost:8080/swagger/index.html`
-- 管理端: `http://localhost:8081` (沿用原 admin 模板)
+- 管理端: `http://localhost:8081` (默认,通过 `FRONTEND_PORT` 调整)
 
 首次启动会自动跑 migration + seed,创建:
 - 5 个角色: `super_admin`, `common`, `student`, `employer`, `agent`
+
+#### 端口配置(改了不用改一堆文件)
+
+模板里所有"写死 8080"的地方都改成跟 `BACKEND_PORT` env 走。要换端口只需设一个 env 变量:
+
+```bash
+# 例:把后端从 8080 切到 9000,前端从 8081 切到 9081
+BACKEND_PORT=9000 FRONTEND_PORT=9081 docker compose up -d
+```
+
+它会自动同步四处:
+- docker-compose 的后端 `SERVER_PORT` + `STORAGE_BASE_URL` + 主机/容器端口映射
+- admin frontend nginx 模板里 3 处 `proxy_pass`(`/api/` `/files/` `/swagger/`)用 `envsubst` 在容器启动时渲染
+- uniapp 的设置页("我的 → 服务器设置")可以运行时切换 API base URL,不用重新打包
+
+默认值都设了 `BACKEND_PORT=8080` / `FRONTEND_PORT=8081`,不传 env 就用默认。
 - 3 个预置体验账号:
   - 管理员: `admin` / `admin123`
   - 学生: `demo_student` / `demo123` (已通过认证)
@@ -121,10 +137,10 @@ docker compose up -d
 ### 2. 启动小程序
 
 1. 用 HBuilderX 打开 `uniapp/` 目录
-2. 修改 `utils/constants.js` 里的 `API_BASE_URL`:
-   - Android 模拟器: `http://10.0.2.2:8080`
-   - iOS 模拟器: `http://localhost:8080`
-   - 真机/小程序开发工具: `http://<你的电脑局域网IP>:8080`
+2. **后端地址默认 `http://localhost:8080`,要改的话**:在 HBuilderX 真机预览/真机扫码时,小程序里"我的 → 服务器设置"里改,不用重新打包;开发期改 `utils/api-base.js` 里的 `DEFAULT_URL` 即可:
+   - Android 模拟器: `http://10.0.2.2:<BACKEND_PORT>`
+   - iOS 模拟器: `http://localhost:<BACKEND_PORT>`
+   - 真机/小程序开发工具: `http://<你的电脑局域网IP>:<BACKEND_PORT>`
 3. 在 `manifest.json` 填入你的微信小程序 appid(`mp-weixin.appid`)
 4. 运行 → 运行到小程序模拟器(或真机/微信开发者工具)
 5. 用 `demo_student` / `demo_employer` / `demo_agent` 登录体验
