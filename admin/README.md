@@ -46,7 +46,13 @@ BACKEND_PORT=9000 FRONTEND_PORT=9081 docker compose up -d
 
 Both the host port mapping, container-side `SERVER_PORT`, `STORAGE_BASE_URL`, AND the admin frontend's nginx `proxy_pass` URLs follow it — no file edits needed. The admin frontend's `nginx.conf` is a template; `envsubst` renders `${BACKEND_PORT}` at container start.
 
-The uni-app mini-program reads the API URL from local storage (configurable in "我的 → 服务器设置"), so it also adapts without a rebuild.
+The uni-app mini-program reads the API URL from local storage (configurable in "我的 → 服务器设置"), so it also adapts without a rebuild. For production builds, the default API URL is set at build time via the `VITE_API_BASE_URL` env var:
+
+```bash
+VITE_API_BASE_URL=https://api.example.com:8082 npm run build:h5
+```
+
+Without it, the default is `http://localhost:8080`.
 
 ## Layout
 

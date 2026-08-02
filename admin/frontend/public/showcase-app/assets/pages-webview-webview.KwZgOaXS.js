@@ -1,0 +1,1 @@
+import{c as r,a6 as o,o as s}from"./index-BJSiYby4.js";import{_ as t}from"./_plugin-vue_export-helper.BCo6x5W8.js";const a=t({data:()=>({url:""}),onLoad(r){this.url=r.url||""}},[["render",function(t,a,e,n,u,l){const c=o;return s(),r(c,{src:u.url},null,8,["src"])}]]);export{a as default};

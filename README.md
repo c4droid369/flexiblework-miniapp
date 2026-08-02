@@ -137,10 +137,25 @@ BACKEND_PORT=9000 FRONTEND_PORT=9081 docker compose up -d
 ### 2. 启动小程序
 
 1. 用 HBuilderX 打开 `uniapp/` 目录
-2. **后端地址默认 `http://localhost:8080`,要改的话**:在 HBuilderX 真机预览/真机扫码时,小程序里"我的 → 服务器设置"里改,不用重新打包;开发期改 `utils/api-base.js` 里的 `DEFAULT_URL` 即可:
+2. **后端地址两层配置**(运行时 + 构建时):
+
+   **构建时(推荐用于生产部署)**:build 时传 `VITE_API_BASE_URL`,首次启动就直接连对后端,不用用户手动改 settings:
+   ```bash
+   # PowerShell
+   $env:VITE_API_BASE_URL = "https://api.example.com:8082"
+   .\node_modules\.bin\uni.cmd build --platform h5
+
+   # Bash / Git Bash
+   VITE_API_BASE_URL=https://api.example.com:8082 npm run build:h5
+   ```
+   这个值会被 Vite 内联到 `utils/api-base.js` 的 `BUILD_URL`,作为首次打开的默认值。
+
+   **运行时(开发/调试)**:真机预览或换环境时,小程序里"我的 → 服务器设置"里改,实时生效并写到 storage:
    - Android 模拟器: `http://10.0.2.2:<BACKEND_PORT>`
    - iOS 模拟器: `http://localhost:<BACKEND_PORT>`
    - 真机/小程序开发工具: `http://<你的电脑局域网IP>:<BACKEND_PORT>`
+
+   两层关系:构建时 env 设的是默认值,运行时 settings 改的是覆盖值;settings 里的"恢复默认"按钮会回到构建时的默认值。
 3. 在 `manifest.json` 填入你的微信小程序 appid(`mp-weixin.appid`)
 4. 运行 → 运行到小程序模拟器(或真机/微信开发者工具)
 5. 用 `demo_student` / `demo_employer` / `demo_agent` 登录体验
