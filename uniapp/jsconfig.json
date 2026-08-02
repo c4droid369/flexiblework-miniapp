@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./*"]
+        },
+        "checkJs": false,
+        "allowJs": true
+    },
+    "include": [
+        "**/*.js",
+        "**/*.ts",
+        "**/*.vue"
+    ],
+    "exclude": [
+        "node_modules",
+        "unpackage",
+        "dist"
+    ]
+}

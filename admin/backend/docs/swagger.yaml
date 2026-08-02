@@ -1,0 +1,1390 @@
+basePath: /api/v1
+definitions:
+  github_com_admin-template_backend_internal_dto.AssignMenusReq:
+    properties:
+      menu_ids:
+        items:
+          type: integer
+        type: array
+    required:
+    - menu_ids
+    type: object
+  github_com_admin-template_backend_internal_dto.BatchDeleteReq:
+    properties:
+      ids:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+    required:
+    - ids
+    type: object
+  github_com_admin-template_backend_internal_dto.ChangeStatusReq:
+    properties:
+      status:
+        enum:
+        - 1
+        - 2
+        type: integer
+    required:
+    - status
+    type: object
+  github_com_admin-template_backend_internal_dto.CreateMenuReq:
+    properties:
+      component:
+        maxLength: 255
+        type: string
+      icon:
+        maxLength: 64
+        type: string
+      name:
+        maxLength: 64
+        type: string
+      parent_id:
+        type: integer
+      path:
+        maxLength: 255
+        type: string
+      perm_code:
+        maxLength: 64
+        type: string
+      sort:
+        type: integer
+      title:
+        maxLength: 64
+        type: string
+      type:
+        enum:
+        - 1
+        - 2
+        - 3
+        type: integer
+      visible:
+        type: boolean
+    required:
+    - name
+    - type
+    type: object
+  github_com_admin-template_backend_internal_dto.CreateRoleReq:
+    properties:
+      code:
+        maxLength: 64
+        minLength: 1
+        type: string
+      description:
+        maxLength: 255
+        type: string
+      menu_ids:
+        items:
+          type: integer
+        type: array
+      name:
+        maxLength: 64
+        minLength: 1
+        type: string
+      sort:
+        type: integer
+      status:
+        enum:
+        - 1
+        - 2
+        type: integer
+    required:
+    - code
+    - name
+    type: object
+  github_com_admin-template_backend_internal_dto.CreateUserReq:
+    properties:
+      avatar:
+        maxLength: 255
+        type: string
+      email:
+        maxLength: 128
+        type: string
+      nickname:
+        maxLength: 64
+        type: string
+      password:
+        maxLength: 128
+        minLength: 6
+        type: string
+      phone:
+        maxLength: 32
+        type: string
+      remark:
+        maxLength: 255
+        type: string
+      role_ids:
+        items:
+          type: integer
+        type: array
+      username:
+        maxLength: 64
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  github_com_admin-template_backend_internal_dto.LoginReq:
+    properties:
+      password:
+        example: admin123
+        maxLength: 128
+        minLength: 6
+        type: string
+      username:
+        example: admin
+        maxLength: 64
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  github_com_admin-template_backend_internal_dto.LoginResp:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        description: seconds
+        type: integer
+      permissions:
+        description: perm_codes the user has
+        items:
+          type: string
+        type: array
+      refresh_token:
+        type: string
+      token_type:
+        description: always "Bearer"
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_dto.LogoutReq:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_dto.MeResp:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      last_login_at:
+        type: string
+      menus:
+        items:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuTree'
+        type: array
+      nickname:
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      phone:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RoleBrief'
+        type: array
+      status:
+        type: integer
+      username:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_dto.MenuResp:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuTree'
+        type: array
+      component:
+        type: string
+      created_at:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      parent_id:
+        type: integer
+      path:
+        type: string
+      perm_code:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+      updated_at:
+        type: string
+      visible:
+        type: boolean
+    type: object
+  github_com_admin-template_backend_internal_dto.MenuTree:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuTree'
+        type: array
+      component:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      parent_id:
+        type: integer
+      path:
+        type: string
+      perm_code:
+        type: string
+      sort:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+      visible:
+        type: boolean
+    type: object
+  github_com_admin-template_backend_internal_dto.RefreshReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_admin-template_backend_internal_dto.ResetPasswordReq:
+    properties:
+      new_password:
+        maxLength: 128
+        minLength: 6
+        type: string
+    required:
+    - new_password
+    type: object
+  github_com_admin-template_backend_internal_dto.RoleBrief:
+    properties:
+      code:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_dto.RoleResp:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      menu_ids:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_dto.UpdateMenuReq:
+    properties:
+      component:
+        maxLength: 255
+        type: string
+      icon:
+        maxLength: 64
+        type: string
+      name:
+        maxLength: 64
+        type: string
+      parent_id:
+        type: integer
+      path:
+        maxLength: 255
+        type: string
+      perm_code:
+        maxLength: 64
+        type: string
+      sort:
+        type: integer
+      status:
+        enum:
+        - 1
+        - 2
+        type: integer
+      title:
+        maxLength: 64
+        type: string
+      type:
+        enum:
+        - 1
+        - 2
+        - 3
+        type: integer
+      visible:
+        type: boolean
+    type: object
+  github_com_admin-template_backend_internal_dto.UpdateRoleReq:
+    properties:
+      description:
+        maxLength: 255
+        type: string
+      menu_ids:
+        items:
+          type: integer
+        type: array
+      name:
+        maxLength: 64
+        type: string
+      sort:
+        type: integer
+      status:
+        enum:
+        - 1
+        - 2
+        type: integer
+    type: object
+  github_com_admin-template_backend_internal_dto.UpdateUserReq:
+    properties:
+      avatar:
+        maxLength: 255
+        type: string
+      email:
+        maxLength: 128
+        type: string
+      nickname:
+        maxLength: 64
+        type: string
+      phone:
+        maxLength: 32
+        type: string
+      remark:
+        maxLength: 255
+        type: string
+      role_ids:
+        items:
+          type: integer
+        type: array
+      status:
+        enum:
+        - 1
+        - 2
+        type: integer
+    type: object
+  github_com_admin-template_backend_internal_dto.UserResp:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      last_login_at:
+        type: string
+      last_login_ip:
+        type: string
+      nickname:
+        type: string
+      phone:
+        type: string
+      remark:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RoleBrief'
+        type: array
+      status:
+        type: integer
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_pkg_response.Envelope:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  github_com_admin-template_backend_internal_pkg_response.PageData:
+    properties:
+      list: {}
+      page:
+        type: integer
+      size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  github_com_admin-template_backend_internal_service.UploadResult:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      size:
+        type: integer
+      url:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: RBAC admin backend — auth, users/roles/menus CRUD, operation log, file
+    upload, Excel/CSV export.
+  title: Admin Template API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 用用户名密码换取 access + refresh token。返回的 permissions 数组同时进 JWT claims，2h
+        内免查 DB。
+      parameters:
+      - description: credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.LoginResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      summary: 登录
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 可选的 refresh_token，传入则一并吊销
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.LogoutReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 登出
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: 包含 profile、roles、permissions（按钮权限码数组）、menus（用于前端动态路由）。
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MeResp'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 当前用户信息
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 用有效 refresh token 换新的 access + refresh。旧 refresh 被吊销（rotation）；如发现已被吊销的
+        token 复用，会吊销该用户整个 token 家族。
+      parameters:
+      - description: refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RefreshReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.LoginResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      summary: 刷新 token
+      tags:
+      - Auth
+  /files-list:
+    get:
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页大小
+        in: query
+        name: size
+        type: integer
+      - description: 模糊搜索原始名/存储名
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.PageData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 已上传文件列表
+      tags:
+      - Files
+  /files-list/{id}:
+    delete:
+      parameters:
+      - description: 文件 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 删除文件
+      tags:
+      - Files
+  /system/logs:
+    get:
+      parameters:
+      - description: 页码 (默认 1)
+        in: query
+        name: page
+        type: integer
+      - description: 每页大小 (默认 20)
+        in: query
+        name: size
+        type: integer
+      - description: 模糊搜索用户名/路径/操作
+        in: query
+        name: keyword
+        type: string
+      - description: 按 action 模糊过滤
+        in: query
+        name: action
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.PageData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 操作日志列表
+      tags:
+      - System/Logs
+  /system/logs/batch-delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID 列表
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 批量删除日志
+      tags:
+      - System/Logs
+  /system/menus:
+    get:
+      description: 返回全部菜单的层级结构（不过滤权限），仅用于管理后台配置。
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuTree'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 菜单树（完整）
+      tags:
+      - System/Menus
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 新菜单
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.CreateMenuReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuResp'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 创建菜单
+      tags:
+      - System/Menus
+  /system/menus/{id}:
+    delete:
+      parameters:
+      - description: 菜单 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 删除菜单（递归删除子项）
+      tags:
+      - System/Menus
+    get:
+      parameters:
+      - description: 菜单 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuResp'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 获取单个菜单
+      tags:
+      - System/Menus
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 菜单 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 要更新的字段
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UpdateMenuReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.MenuResp'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 更新菜单
+      tags:
+      - System/Menus
+  /system/roles:
+    get:
+      parameters:
+      - description: 页码 (默认 1)
+        in: query
+        name: page
+        type: integer
+      - description: 每页大小 (默认 10, 最大 200)
+        in: query
+        name: size
+        type: integer
+      - description: 模糊搜索名称/编码
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.PageData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 角色列表
+      tags:
+      - System/Roles
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 新角色
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.CreateRoleReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RoleResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "409":
+          description: 角色编码已存在
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 创建角色
+      tags:
+      - System/Roles
+  /system/roles/{id}:
+    delete:
+      parameters:
+      - description: 角色 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 删除单个角色
+      tags:
+      - System/Roles
+    get:
+      parameters:
+      - description: 角色 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RoleResp'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 获取单个角色
+      tags:
+      - System/Roles
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 角色 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 要更新的字段
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UpdateRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.RoleResp'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 更新角色
+      tags:
+      - System/Roles
+  /system/roles/{id}/menus:
+    post:
+      consumes:
+      - application/json
+      description: 覆盖式写入；传入空数组可清空。
+      parameters:
+      - description: 角色 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 菜单 ID 列表
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.AssignMenusReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 给角色分配菜单
+      tags:
+      - System/Roles
+  /system/roles/batch-delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID 列表
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 批量删除角色
+      tags:
+      - System/Roles
+  /system/roles/export/csv:
+    get:
+      parameters:
+      - description: 模糊搜索
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: 导出角色列表为 CSV
+      tags:
+      - System/Roles
+  /system/roles/export/excel:
+    get:
+      parameters:
+      - description: 模糊搜索
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: 导出角色列表为 Excel
+      tags:
+      - System/Roles
+  /system/users:
+    get:
+      parameters:
+      - description: 页码 (默认 1)
+        in: query
+        name: page
+        type: integer
+      - description: 每页大小 (默认 10, 最大 200)
+        in: query
+        name: size
+        type: integer
+      - description: 模糊搜索用户名/昵称/邮箱
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.PageData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 用户列表
+      tags:
+      - System/Users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 新用户
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UserResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "409":
+          description: 用户名已存在
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 创建用户
+      tags:
+      - System/Users
+  /system/users/{id}:
+    delete:
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 删除单个用户
+      tags:
+      - System/Users
+    get:
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UserResp'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 获取单个用户
+      tags:
+      - System/Users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 要更新的字段（指针字段，未传则不更新）
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_dto.UserResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 更新用户
+      tags:
+      - System/Users
+  /system/users/{id}/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: 管理员无需知道旧密码即可设置新密码。
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 新密码
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.ResetPasswordReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 重置用户密码
+      tags:
+      - System/Users
+  /system/users/{id}/roles:
+    post:
+      consumes:
+      - application/json
+      description: 'body {ids: [...]} 是角色 ID 列表，传空数组清空。'
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 角色 ID 列表
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 给用户分配角色
+      tags:
+      - System/Users
+  /system/users/{id}/status:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 目标状态：1=启用 2=禁用
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.ChangeStatusReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 启用/禁用用户
+      tags:
+      - System/Users
+  /system/users/batch-delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID 列表
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_admin-template_backend_internal_dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 批量删除用户
+      tags:
+      - System/Users
+  /system/users/export/csv:
+    get:
+      parameters:
+      - description: 模糊搜索（与 List 同语义）
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: 导出用户列表为 CSV
+      tags:
+      - System/Users
+  /system/users/export/excel:
+    get:
+      parameters:
+      - description: 模糊搜索（与 List 同语义）
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: 导出用户列表为 Excel
+      tags:
+      - System/Users
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_admin-template_backend_internal_service.UploadResult'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_admin-template_backend_internal_pkg_response.Envelope'
+      security:
+      - BearerAuth: []
+      summary: 上传文件
+      tags:
+      - Files
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

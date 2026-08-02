@@ -1,0 +1,58 @@
+# ----- Go -----
+backend/bin/
+backend/server
+backend/coverage.out
+backend/coverage.html
+backend/*.test
+backend/*.prof
+backend/storage/uploads/
+
+# ----- Node / Vue / Vite -----
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.vite/
+
+# ----- IDE -----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ----- OS -----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- Local env -----
+.env
+.env.local
+*.local
+
+# ----- Secrets -----
+*.pem
+*.key
+secrets/
+
+# ----- Build artifacts -----
+bin/
+tmp/
+dist/
+
+# ----- Logs ----
+*.log
+logs/
+
+# ----- Coverage ----
+coverage/
+.nyc_output/
+
+# ----- Docker ----
+docker-compose.override.yml

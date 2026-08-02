@@ -1,0 +1,45 @@
+# Reference config for backend. The container reads env vars (see docker-compose.yml);
+# this file documents the full set of supported knobs and their defaults.
+# Copy to configs/config.local.yaml for local overrides if needed (not used in container).
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  env: development
+  read_timeout: 15s
+  write_timeout: 30s
+  shutdown_timeout: 20s
+
+log:
+  level: info
+  format: text   # text | json
+
+db:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: ""
+  name: admin_template
+
+jwt:
+  # MUST be ≥ 32 bytes in production. Override via env JWT_SECRET.
+  secret: change-me-in-production-please-use-32-bytes-min
+  access_ttl: 2h
+  refresh_ttl: 168h
+  issuer: admin-template
+
+storage:
+  type: local    # local | oss | s3 | minio (only local implemented by default)
+  local_path: ./storage/uploads
+  base_url: /files
+  upload_max_size: 10485760   # 10 MiB
+
+cors:
+  origins: "*"   # comma-separated list, or "*"
+
+swagger:
+  enabled: true   # exposes /swagger/index.html when true
+
+seed:
+  admin_username: admin
+  admin_password: admin123

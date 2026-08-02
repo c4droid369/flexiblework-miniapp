@@ -1,0 +1,55 @@
+# golangci-lint v2 — see https://golangci-lint.run/product/configuration/
+#
+# The bundle is deliberately strict. Add `//nolint:lintername` on the
+# specific line (with a 1-line justification) only when an exception is
+# truly justified; never blanket-disable a linter to silence noise.
+
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    - errcheck       # catch unchecked errors
+    - govet          # standard go vet checks
+    - ineffassign    # unused assignments
+    - staticcheck    # the heavyweight static analysis bundle
+    - unused         # unused funcs/vars/params
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - '-SA1019'  # allow deprecated for now (e.g. prometheus if we add it later)
+    errcheck:
+      # `defer resp.Body.Close()` is the idiomatic HTTP pattern; we don't
+      # want lint noise for it. Default `check-blank: false` lets test code
+      # do `_, _ = json.Marshal(...)` without ceremony — production code
+      # shouldn't, but test helpers can tolerate it.
+      check-blank: false
+      exclude-functions:
+        - (*net/http.Response).Body.Close
+        - (*os.File).Close
+        - (*multipart.Writer).Close
+        # excelize's writers return errors for settings we don't care
+        # about (e.g. duplicate sheet names) — verify the export result by
+        # reading the body bytes, not by checking every setter return.
+        - (*excelize.File).SetSheetName
+        - (*excelize.File).NewSheet
+        - (*excelize.File).SetCellValue
+        - (*excelize.File).CoordinatesToCellName
+
+  exclusions:
+    rules:
+      # The seed / test files intentionally exercise long file bodies
+      # and have many vars; relax per-line only on those files when needed.
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+severity:
+  default: error

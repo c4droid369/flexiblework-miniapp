@@ -1,0 +1,157 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "校园灵活用工",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/jobs/jobs",
+			"style": {
+				"navigationBarTitleText": "兼职大厅",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/orders/orders",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/applications/applications",
+			"style": {
+				"navigationBarTitleText": "我的报名",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/auth/register",
+			"style": {
+				"navigationBarTitleText": "注册账号"
+			}
+		},
+		{
+			"path": "pages/auth/role-select",
+			"style": {
+				"navigationBarTitleText": "选择身份",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/job-detail/job-detail",
+			"style": {
+				"navigationBarTitleText": "岗位详情"
+			}
+		},
+		{
+			"path": "pages/application-detail/application-detail",
+			"style": {
+				"navigationBarTitleText": "报名详情"
+			}
+		},
+		{
+			"path": "pages/order-detail/order-detail",
+			"style": {
+				"navigationBarTitleText": "订单详情"
+			}
+		},
+		{
+			"path": "pages/certification/certification",
+			"style": {
+				"navigationBarTitleText": "认证中心"
+			}
+		},
+		{
+			"path": "pages/job-publish/job-publish",
+			"style": {
+				"navigationBarTitleText": "发布岗位"
+			}
+		},
+		{
+			"path": "pages/my-jobs/my-jobs",
+			"style": {
+				"navigationBarTitleText": "我的岗位",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/dashboard/dashboard",
+			"style": {
+				"navigationBarTitleText": "工作台"
+			}
+		},
+		{
+			"path": "pages/messages/messages",
+			"style": {
+				"navigationBarTitleText": "消息中心"
+			}
+		},
+		{
+			"path": "pages/settings/settings",
+			"style": {
+				"navigationBarTitleText": "服务器设置"
+			}
+		},
+		{
+			"path": "pages/webview/webview",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "校园灵活用工",
+		"navigationBarBackgroundColor": "#FF7A45",
+		"backgroundColor": "#F7F8FA"
+	},
+	"tabBar": {
+		"color": "#86909C",
+		"selectedColor": "#FF7A45",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/applications/applications",
+				"iconPath": "static/tabbar/apply.png",
+				"selectedIconPath": "static/tabbar/apply-active.png",
+				"text": "报名"
+			},
+			{
+				"pagePath": "pages/orders/orders",
+				"iconPath": "static/tabbar/order.png",
+				"selectedIconPath": "static/tabbar/order-active.png",
+				"text": "订单"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"iconPath": "static/tabbar/mine.png",
+				"selectedIconPath": "static/tabbar/mine-active.png",
+				"text": "我的"
+			}
+		]
+	}
+}

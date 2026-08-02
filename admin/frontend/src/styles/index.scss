@@ -1,0 +1,51 @@
+// Centralized SCSS entry. Element Plus handles most styling; this file holds
+// a few global resets and app-level variables. Avoid per-component global
+// CSS — use <style scoped> instead.
+
+:root {
+  --app-header-height: 56px;
+  --app-sidebar-width: 220px;
+  --app-sidebar-collapsed-width: 64px;
+  --app-primary: #409eff;
+  --app-text: #303133;
+  --app-text-secondary: #606266;
+  --app-border: #e4e7ed;
+  --app-bg: #f5f7fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  color: var(--app-text);
+  background-color: var(--app-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--app-primary);
+  text-decoration: none;
+}
+
+.app-container {
+  padding: 16px;
+}
+
+.page-toolbar {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-form {
+  background: #fff;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}

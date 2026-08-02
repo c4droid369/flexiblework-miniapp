@@ -1,0 +1,16 @@
+{
+    "libVersion": "3.17.0",
+    "projectname": "uniapp",
+    "description": "私有项目配置 — `urlCheck: false` 让 WeChat DevTools 在开发期不校验合法域名(仅本地生效,不影响真机预览和发布)。",
+    "setting": {
+        "urlCheck": false,
+        "coverView": true,
+        "lazyloadPlaceholderEnable": false,
+        "skylineRenderEnable": false,
+        "preloadBackgroundData": false,
+        "autoAudits": false,
+        "showShadowRootInWxmlPanel": true,
+        "compileHotReLoad": true,
+        "checkInvalidDomain": false
+    }
+}

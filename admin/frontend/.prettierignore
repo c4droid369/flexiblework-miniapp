@@ -1,0 +1,8 @@
+dist
+node_modules
+test-results
+coverage
+*.local
+package-lock.json
+src/auto-imports.d.ts
+src/components.d.ts

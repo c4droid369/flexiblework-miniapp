@@ -1,0 +1,97 @@
+/**
+ * 校园灵活用工小程序 — 主题色 + 全局变量
+ *
+ * 活力青春风:橙黄/绿主色 + 圆角,校园产品常用调性。
+ * 修改下面的变量即可整体换肤,组件中可直接使用这些变量。
+ */
+
+/* 品牌主色 — 活力橙 */
+$brand-primary: #FF7A45;
+$brand-primary-light: #FFB088;
+$brand-primary-dark: #E5612A;
+$brand-primary-bg: #FFF3EB;
+
+/* 品牌辅色 — 清新绿 */
+$brand-secondary: #4ECB73;
+$brand-secondary-light: #8FE0A4;
+$brand-secondary-bg: #EAF9F0;
+
+/* 品牌强调 — 暖黄 */
+$brand-accent: #FFC53D;
+$brand-accent-bg: #FFF8E1;
+
+/* 状态色 */
+$color-success: #4ECB73;
+$color-warning: #FFB137;
+$color-danger: #F5222D;
+$color-info: #86909C;
+
+/* 文字颜色 */
+$text-primary: #1F2329;
+$text-regular: #4E5969;
+$text-secondary: #6B7785;
+$text-placeholder: #C9CDD4;
+$text-disabled: #C9CDD4;
+$text-inverse: #FFFFFF;
+
+/* 背景色 */
+$bg-page: #F7F8FA;
+$bg-card: #FFFFFF;
+$bg-hover: #F2F3F5;
+$bg-mask: rgba(0, 0, 0, 0.4);
+
+/* 边框颜色 */
+$border-color: #E5E6EB;
+$border-color-light: #F2F3F5;
+
+/* 圆角 */
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+$radius-pill: 9999rpx;
+
+/* 间距 */
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+
+/* 字号 */
+$font-xs: 22rpx;
+$font-sm: 26rpx;
+$font-base: 28rpx;
+$font-md: 30rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+$font-xxl: 44rpx;
+
+/* 行高 */
+$line-tight: 1.3;
+$line-normal: 1.5;
+$line-relaxed: 1.7;
+
+/* 阴影 */
+$shadow-sm: 0 2rpx 8rpx rgba(31, 35, 41, 0.06);
+$shadow-md: 0 4rpx 16rpx rgba(31, 35, 41, 0.08);
+$shadow-lg: 0 8rpx 24rpx rgba(31, 35, 41, 0.12);
+
+/* 兼容 uni-ui 默认变量(若使用) */
+$uni-color-primary: $brand-primary;
+$uni-color-success: $color-success;
+$uni-color-warning: $color-warning;
+$uni-color-error: $color-danger;
+
+$uni-text-color: $text-primary;
+$uni-text-color-inverse: $text-inverse;
+$uni-text-color-grey: $text-secondary;
+$uni-text-color-placeholder: $text-placeholder;
+$uni-text-color-disable: $text-disabled;
+
+$uni-bg-color: $bg-card;
+$uni-bg-color-grey: $bg-page;
+$uni-bg-color-hover: $bg-hover;
+$uni-bg-color-mask: $bg-mask;
+
+$uni-border-color: $border-color;
